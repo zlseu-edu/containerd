@@ -69,7 +69,9 @@ func v1MountPoint() (string, error) {
 		if numPostFields == 0 {
 			return "", fmt.Errorf("Found no fields post '-' in %q", text)
 		}
-		if postSeparatorFields[0] == "cgroup" {
+
+		// change 0 to 1. support cgroup2
+		if postSeparatorFields[1] == "cgroup" {
 			// check that the mount is properly formated.
 			if numPostFields < 3 {
 				return "", fmt.Errorf("Error found less than 3 fields post '-' in %q", text)

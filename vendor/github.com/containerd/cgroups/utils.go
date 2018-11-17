@@ -33,6 +33,11 @@ import (
 
 var isUserNS = runningInUserNS()
 
+const (
+	cgroup2Name   = "unified"
+	cgroup2Option = "nsdelegate"
+)
+
 // runningInUserNS detects whether we are currently running in a user namespace.
 // Copied from github.com/lxc/lxd/shared/util.go
 func runningInUserNS() bool {
@@ -81,6 +86,7 @@ func defaults(root string) ([]Subsystem, error) {
 		NewMemory(root),
 		NewBlkio(root),
 		NewRdma(root),
+		NewUnified(root),
 	}
 	// only add the devices cgroup if we are not in a user namespace
 	// because modifications are not allowed
@@ -223,6 +229,13 @@ func parseCgroupFromReader(r io.Reader) (map[string]string, error) {
 		if len(parts) < 3 {
 			return nil, fmt.Errorf("invalid cgroup entry: %q", text)
 		}
+
+		// check if cgroup2 enabled.
+		if parts[1] == "" {
+			cgroups[cgroup2Name] = parts[2]
+			continue
+		}
+
 		for _, subs := range strings.Split(parts[1], ",") {
 			if subs != "" {
 				cgroups[subs] = parts[2]
