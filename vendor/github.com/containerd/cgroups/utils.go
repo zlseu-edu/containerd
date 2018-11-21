@@ -258,7 +258,7 @@ func getCgroupDestination(subsystem string) (string, error) {
 		}
 		fields := strings.Fields(s.Text())
 		for _, opt := range strings.Split(fields[len(fields)-1], ",") {
-			if opt == subsystem {
+			if opt == subsystem  || (subsystem == cgroup2Name && opt == cgroup2Option){
 				return fields[3], nil
 			}
 		}

@@ -52,10 +52,14 @@ func Load(hierarchy Hierarchy, path Path) (Cgroup, error) {
 	if err != nil {
 		return nil, err
 	}
+	var enabled []Subsystem
 	// check the the subsystems still exist
 	for _, s := range pathers(subsystems) {
 		p, err := path(s.Name())
 		if err != nil {
+			if _, err := path(Unified); err == nil {
+				continue
+			}
 			if os.IsNotExist(errors.Cause(err)) {
 				return nil, ErrCgroupDeleted
 			}
@@ -67,10 +71,11 @@ func Load(hierarchy Hierarchy, path Path) (Cgroup, error) {
 			}
 			return nil, err
 		}
+		enabled = append(enabled, s)
 	}
 	return &cgroup{
 		path:       path,
-		subsystems: subsystems,
+		subsystems: enabled,
 	}, nil
 }
 
